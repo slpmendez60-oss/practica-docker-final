@@ -1,11 +1,5 @@
-version: '3.8'
-
 services:
 
-  # ─────────────────────────────────────────────
-  # SERVICIO: db
-  # Base de datos PostgreSQL.
-  # ─────────────────────────────────────────────
   db:
     image: postgres:14.3
     container_name: ${POSTGRES_CONTAINER_NAME}
@@ -26,13 +20,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # ─────────────────────────────────────────────
-  # SERVICIO: backend
-  # API NestJS.
-  # ─────────────────────────────────────────────
   backend:
     build:
-      context: ./tesloshop-app/teslo-shop
+      context: ./teslo-shop
       target: ${STAGE}
       dockerfile: Dockerfile
     container_name: ${BACKEND_CONTAINER_NAME}
@@ -51,7 +41,7 @@ services:
       HOST_API: ${HOST_API}
       JWT_SECRET: ${JWT_SECRET}
     volumes:
-      - ./tesloshop-app/teslo-shop:/app
+      - ./teslo-shop:/app
       - /app/node_modules
     depends_on:
       db:
@@ -60,13 +50,9 @@ services:
       - teslo-network
     command: npm run start:dev
 
-  # ─────────────────────────────────────────────
-  # SERVICIO: frontend
-  # Angular compilado y servido con Nginx.
-  # ─────────────────────────────────────────────
   frontend:
     build:
-      context: ./tesloshop-app/angular-tesloshop
+      context: ./angular-tesloshop
       dockerfile: Dockerfile
     container_name: ${FRONTEND_CONTAINER_NAME}
     restart: always
@@ -77,16 +63,10 @@ services:
     networks:
       - teslo-network
 
-# ─────────────────────────────────────────────
-# VOLÚMENES
-# ─────────────────────────────────────────────
 volumes:
   postgres-data:
     driver: local
 
-# ─────────────────────────────────────────────
-# REDES
-# ─────────────────────────────────────────────
 networks:
   teslo-network:
     driver: bridge
